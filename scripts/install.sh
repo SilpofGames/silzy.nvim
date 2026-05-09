@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # silzy.nvim installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/yourusername/silzy.nvim/main/scripts/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.sh | bash
 
 set -euo pipefail
 
@@ -47,7 +47,7 @@ info "Neovim $NVIM_VERSION detected — OK"
 NVIM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 SILZY_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/silzy"
 SILZY_MANAGER_DIR="$SILZY_DATA_DIR/manager"
-REPO_URL="https://github.com/yourusername/silzy.nvim.git"
+REPO_URL="https://github.com/SilpofGames/silzy.nvim.git"
 
 # ─── Backup existing config ───────────────────────────────────────────────────
 if [[ -d "$NVIM_CONFIG_DIR" ]]; then
