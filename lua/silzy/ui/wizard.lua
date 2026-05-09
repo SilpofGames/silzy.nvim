@@ -1,19 +1,15 @@
 local M = {}
 
 local languages = {
-  { key = "1", icon = "☕", label = "Java",       id = "java"   },
-  { key = "2", icon = "󰙱 ", label = "C",          id = "c"      },
-  { key = "3", icon = "󰙲 ", label = "C++",        id = "cpp"    },
-  { key = "4", icon = "󰌛 ", label = "C#",         id = "csharp" },
-  { key = "5", icon = "🐍", label = "Python",     id = "python" },
-  { key = "6", icon = "🌙", label = "Lua",        id = "lua"    },
-  { key = "7", icon = "󰌞 ", label = "JavaScript", id = "js"     },
-  { key = "8", icon = "󰛦 ", label = "TypeScript", id = "ts"     },
-  { key = "9", icon = "🦀", label = "Rust",       id = "rust"   },
-  { key = "0", icon = "🐹", label = "Go",         id = "go"     },
-  { key = "r", icon = "💎", label = "Ruby",       id = "ruby"   },
-  { key = "z", icon = "⚡", label = "Zig",        id = "zig"    },
-  { key = "m", icon = "  ", label = "Minimal",    id = "minimal"},
+  { key = "1", icon = "󰙱 ", label = "C",                   id = "c"      },
+  { key = "2", icon = "🐹", label = "Go",                  id = "go"     },
+  { key = "3", icon = "☕", label = "Java",                id = "java"   },
+  { key = "4", icon = "🌙", label = "Lua",                 id = "lua"    },
+  { key = "5", icon = "🐘", label = "PHP",                 id = "php"    },
+  { key = "6", icon = "🐍", label = "Python",              id = "python" },
+  { key = "7", icon = "💎", label = "Ruby",                id = "ruby"   },
+  { key = "8", icon = "🦀", label = "Rust",                id = "rust"   },
+  { key = "9", icon = "🌐", label = "Web (HTML, CSS, JS)", id = "web"    },
 }
 
 local function open_native_wizard(callback)
@@ -24,7 +20,7 @@ local function open_native_wizard(callback)
   vim.bo[buf].bufhidden  = "wipe"
   vim.bo[buf].modifiable = true
 
-  local ns  = vim.api.nvim_create_namespace("silzy_wizard")
+  local ns    = vim.api.nvim_create_namespace("silzy_wizard")
   local width = vim.o.columns
 
   local function center(str)
@@ -35,7 +31,7 @@ local function open_native_wizard(callback)
   local function render()
     vim.bo[buf].modifiable = true
     local lines = { "", "", "" }
-    table.insert(lines, center("  Choose your languages  (space = toggle, enter = confirm)"))
+    table.insert(lines, center("Choose your languages  —  space = toggle  —  enter = confirm"))
     table.insert(lines, "")
     table.insert(lines, center(string.rep("─", 44)))
     table.insert(lines, "")
@@ -43,7 +39,7 @@ local function open_native_wizard(callback)
     local item_lines = {}
     for _, lang in ipairs(languages) do
       local tick = selected[lang.id] and "  " or "  "
-      local line = center(string.format("  %s  %s %s", tick, lang.icon, lang.label))
+      local line = center(string.format("  %s  %s  %s", tick, lang.icon, lang.label))
       table.insert(lines, line)
       table.insert(item_lines, { lnum = #lines - 1, lang = lang })
       table.insert(lines, "")

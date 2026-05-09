@@ -1,197 +1,188 @@
 local M = {}
 
-local function common(use)
-  use { "williamboman/mason.nvim",
-    config = function()
-      require("mason").setup({ ui = { border = "rounded" } })
-    end,
-  }
-  use { "williamboman/mason-lspconfig.nvim" }
-  use { "neovim/nvim-lspconfig" }
-  use { "hrsh7th/nvim-cmp",
-    requires = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-cmdline",
-      "L3MON4D3/LuaSnip",
-      "saadparwaiz1/cmp_luasnip",
-      "rafamadriz/friendly-snippets",
-      "onsails/lspkind.nvim",
-    },
-    config = function()
-      local cmp     = require("cmp")
-      local luasnip = require("luasnip")
-      local lspkind = require("lspkind")
-      require("luasnip.loaders.from_vscode").lazy_load()
-      cmp.setup({
-        snippet = { expand = function(args) luasnip.lsp_expand(args.body) end },
-        formatting = { format = lspkind.cmp_format({ mode = "symbol_text", maxwidth = 50 }) },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-k>"]   = cmp.mapping.select_prev_item(),
-          ["<C-j>"]   = cmp.mapping.select_next_item(),
-          ["<C-d>"]   = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"]   = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"]   = cmp.mapping.abort(),
-          ["<CR>"]    = cmp.mapping.confirm({ select = false }),
-          ["<Tab>"]   = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump()
-            else fallback() end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then luasnip.jump(-1)
-            else fallback() end
-          end, { "i", "s" }),
-        }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
-        }),
-        window = {
-          completion    = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
-        },
-      })
-    end,
-  }
-  use { "nvim-treesitter/nvim-treesitter",
-    run = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        auto_install  = true,
-        highlight     = { enable = true },
-        indent        = { enable = true },
-        ensure_installed = { "lua", "vim", "vimdoc", "query" },
-      })
-    end,
-  }
-  use { "nvimtools/none-ls.nvim", requires = { "nvim-lua/plenary.nvim" } }
-  use { "numToStr/Comment.nvim", config = function() require("Comment").setup() end }
-  use { "lewis6991/gitsigns.nvim", config = function() require("gitsigns").setup() end }
-  use { "windwp/nvim-autopairs",
-    config = function()
-      local autopairs = require("nvim-autopairs")
-      autopairs.setup({ check_ts = true })
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      local ok, cmp = pcall(require, "cmp")
-      if ok then cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done()) end
-    end,
-  }
-end
+local presets = {
 
-local function setup_lsp(servers)
-  local ok_mason, mason_lsp = pcall(require, "mason-lspconfig")
-  local ok_lsp,   lspconfig = pcall(require, "lspconfig")
-  if not ok_mason or not ok_lsp then return end
-
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-  if ok_cmp then capabilities = cmp_lsp.default_capabilities(capabilities) end
-
-  mason_lsp.setup({ ensure_installed = vim.tbl_keys(servers) })
-  mason_lsp.setup_handlers({
-    function(server)
-      local opts = servers[server] or {}
-      opts.capabilities = capabilities
-      lspconfig[server].setup(opts)
-    end,
-  })
-end
-
-local lang_servers = {
-  java       = { jdtls = {} },
-  c          = { clangd = {} },
-  cpp        = { clangd = {} },
-  csharp     = { omnisharp = {} },
-  python     = { pyright = {}, ruff_lsp = {} },
-  lua        = { lua_ls = { settings = { Lua = { diagnostics = { globals = { "vim" } }, workspace = { checkThirdParty = false } } } } },
-  js         = { ts_ls = {}, eslint = {} },
-  ts         = { ts_ls = {}, eslint = {} },
-  rust       = { rust_analyzer = {} },
-  go         = { gopls = {} },
-  ruby       = { solargraph = {} },
-  zig        = { zls = {} },
-  minimal    = {},
-}
-
-local lang_extras = {
-  java = function(use)
-    use { "mfussenegger/nvim-jdtls" }
-    use { "nvim-neotest/neotest", requires = { "rcasia/neotest-java" } }
-  end,
   c = function(use)
-    use { "p00f/clangd_extensions.nvim" }
+    use { "silpof/c-dev.nvim",
+      config = function()
+        require("c-dev").setup({
+          compiler = "gcc",
+          default_flags = "-Wall -Wextra -g",
+          auto_format = true,
+          build_dir = "build",
+          valgrind_flags = "--leak-check=full --show-leak-kinds=all --track-origins=yes",
+        })
+      end,
+    }
+    use { "neovim/nvim-lspconfig",
+      requires = {
+        "hrsh7th/nvim-cmp",
+        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
+        "hrsh7th/cmp-path",
+        "L3MON4D3/LuaSnip",
+        "saadparwaiz1/cmp_luasnip",
+      },
+      config = function()
+        local cmp     = require("cmp")
+        local luasnip = require("luasnip")
+        cmp.setup({
+          snippet = { expand = function(args) luasnip.lsp_expand(args.body) end },
+          mapping = cmp.mapping.preset.insert({
+            ["<C-b>"]     = cmp.mapping.scroll_docs(-4),
+            ["<C-f>"]     = cmp.mapping.scroll_docs(4),
+            ["<C-Space>"] = cmp.mapping.complete(),
+            ["<CR>"]      = cmp.mapping.confirm({ select = true }),
+            ["<Tab>"]     = cmp.mapping(function(fallback)
+              if cmp.visible() then cmp.select_next_item()
+              elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump()
+              else fallback() end
+            end, { "i", "s" }),
+          }),
+          sources = cmp.config.sources({
+            { name = "nvim_lsp" }, { name = "luasnip" },
+          }, { { name = "buffer" }, { name = "path" } }),
+        })
+        require("lspconfig").clangd.setup({
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          cmd = {
+            "clangd", "--background-index", "--clang-tidy",
+            "--header-insertion=iwyu", "--completion-style=detailed",
+            "--function-arg-placeholders", "--fallback-style=llvm",
+          },
+        })
+      end,
+    }
   end,
-  cpp = function(use)
-    use { "p00f/clangd_extensions.nvim" }
-    use { "Civitasv/cmake-tools.nvim" }
-  end,
-  csharp = function(use)
-    use { "iabdelkareem/csharp.nvim", requires = { "Tastyep/structlog.nvim" } }
-  end,
-  python = function(use)
-    use { "linux-cultist/venv-selector.nvim" }
-    use { "mfussenegger/nvim-dap-python" }
-  end,
-  lua = function(use)
-    use { "folke/lazydev.nvim" }
-  end,
-  js = function(use)
-    use { "vuki656/package-info.nvim" }
-    use { "b0o/schemastore.nvim" }
-  end,
-  ts = function(use)
-    use { "vuki656/package-info.nvim" }
-    use { "dmmulroy/tsc.nvim" }
-    use { "b0o/schemastore.nvim" }
-  end,
-  rust = function(use)
-    use { "mrcjkb/rustaceanvim" }
-    use { "saecki/crates.nvim" }
-  end,
+
   go = function(use)
-    use { "ray-x/go.nvim", requires = { "ray-x/guihua.lua" } }
+    use { "silpof/go-dev.nvim",
+      config = function() require("go-dev").setup() end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function() require("lspconfig").gopls.setup({}) end,
+    }
   end,
+
+  java = function(use)
+    use { "silpof/java-dev.nvim",
+      config = function() require("java-dev").setup() end,
+    }
+    use { "mfussenegger/nvim-jdtls" }
+  end,
+
+  lua = function(use)
+    use { "silpof/lua-dev.nvim",
+      config = function() require("lua-dev").setup() end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function()
+        require("lspconfig").lua_ls.setup({
+          settings = {
+            Lua = {
+              diagnostics = { globals = { "vim" } },
+              workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
+            },
+          },
+        })
+      end,
+    }
+  end,
+
+  php = function(use)
+    use { "silpof/php-dev.nvim",
+      config = function() require("php-dev").setup() end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function() require("lspconfig").intelephense.setup({}) end,
+    }
+  end,
+
+  python = function(use)
+    use { "silpof/py-dev.nvim",
+      config = function()
+        require("py-dev").setup({ python_cmd = "python3", venv_name = ".venv" })
+      end,
+    }
+    use { "neovim/nvim-lspconfig",
+      requires = { "hrsh7th/nvim-cmp", "hrsh7th/cmp-nvim-lsp" },
+      config = function()
+        local cmp = require("cmp")
+        cmp.setup({ sources = cmp.config.sources({ { name = "nvim_lsp" } }) })
+        require("lspconfig").pyright.setup({
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "strict",
+                autoSearchPaths  = true,
+                useLibraryCodeForTypes = true,
+              },
+            },
+          },
+        })
+      end,
+    }
+  end,
+
   ruby = function(use)
-    use { "suketa/nvim-dap-ruby" }
+    use { "silpof/ruby-dev.nvim",
+      config = function() require("ruby-dev").setup() end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function() require("lspconfig").solargraph.setup({}) end,
+    }
   end,
-  zig = function(use)
-    use { "NTBBloodbath/zig-tools.nvim" }
+
+  rust = function(use)
+    use { "silpof/rust-dev.nvim",
+      config = function() require("rust-dev").setup() end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function()
+        require("lspconfig").rust_analyzer.setup({
+          settings = {
+            ["rust-analyzer"] = { checkOnSave = { command = "clippy" } },
+          },
+        })
+      end,
+    }
+  end,
+
+  web = function(use)
+    use { "silpof/web-dev.nvim",
+      config = function()
+        require("web-dev").setup({ port = 3000 })
+      end,
+    }
+    use { "neovim/nvim-lspconfig",
+      config = function()
+        local lspconfig = require("lspconfig")
+        lspconfig.html.setup({})
+        lspconfig.cssls.setup({})
+        lspconfig.ts_ls.setup({})
+      end,
+    }
   end,
 }
 
 function M.apply(ids, use)
   if type(ids) == "string" then ids = { ids } end
-  common(use)
-
-  local merged_servers = {}
   local seen = {}
-
   for _, id in ipairs(ids) do
-    local servers = lang_servers[id] or {}
-    for name, opts in pairs(servers) do
-      merged_servers[name] = opts
-    end
-    if lang_extras[id] and not seen[id] then
+    if presets[id] and not seen[id] then
       seen[id] = true
-      lang_extras[id](use)
+      presets[id](use)
+    else
+      if not presets[id] then
+        vim.notify("[silzy] Unknown language preset: " .. id, vim.log.levels.WARN)
+      end
     end
-  end
-
-  if next(merged_servers) then
-    use { "neovim/nvim-lspconfig",
-      config = function() setup_lsp(merged_servers) end,
-    }
   end
 end
 
 function M.list()
-  return vim.tbl_keys(lang_servers)
+  return vim.tbl_keys(presets)
 end
 
 return M
