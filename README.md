@@ -14,7 +14,7 @@
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOURUSERNAME/silzy.nvim/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.sh | bash
 ```
 
 Then open Neovim — the first-run wizard appears automatically.
