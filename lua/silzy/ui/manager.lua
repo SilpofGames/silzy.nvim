@@ -23,6 +23,13 @@ local function box(str, w)
   return string.rep(" ", pad) .. str
 end
 
+local cs_state_path = vim.fn.stdpath("data") .. "/silzy/colorscheme.json"
+
+local function save_colorscheme(name)
+  vim.fn.mkdir(vim.fn.fnamemodify(cs_state_path, ":h"), "p")
+  vim.fn.writefile({ vim.fn.json_encode({ colorscheme = name }) }, cs_state_path)
+end
+
 local function get_installed_colorschemes()
   local install_path = vim.fn.stdpath("data") .. "/silzy/plugins"
   local schemes = {}
@@ -357,6 +364,7 @@ function M.open(plugins, install_path)
         local ok, err = pcall(vim.cmd, "colorscheme " .. cs.name)
         if ok then
           STATE.cs_current = cs.name
+          save_colorscheme(cs.name)
           log_entry("Applied colorscheme: " .. cs.name, "DiagnosticOk")
           render()
         else

@@ -133,6 +133,18 @@ function M.load_plugins()
     vim.defer_fn(function() M.install() end, 500)
   end
 
+  local cs_state = vim.fn.stdpath("data") .. "/silzy/colorscheme.json"
+  if vim.fn.filereadable(cs_state) == 1 then
+    local ok, data = pcall(function()
+      return vim.fn.json_decode(table.concat(vim.fn.readfile(cs_state), ""))
+    end)
+    if ok and data and data.colorscheme then
+      vim.defer_fn(function()
+        pcall(vim.cmd, "colorscheme " .. data.colorscheme)
+      end, 10)
+    end
+  end
+
   local themes, rest = {}, {}
   for _, plugin in pairs(M._plugins) do
     if plugin._is_theme then
