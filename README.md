@@ -1,224 +1,209 @@
-# silzy.nvim
-
-> A modern, opinionated Neovim package manager — inspired by Lazy.nvim, batteries included.
+<div align="center">
 
 ```
-  ███████╗██╗██╗     ███████╗██╗   ██╗   ███╗   ██╗██╗   ██╗██╗███╗   ███╗
-  ██╔════╝██║██║     ╚════██║╚██╗ ██╔╝   ████╗  ██║██║   ██║██║████╗ ████║
-  ███████╗██║██║         ██╔╝  ╚████╔╝    ██╔██╗ ██║██║   ██║██║██╔████╔██║
-  ╚════██║██║██║        ██╔╝    ╚██╔╝     ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║
-  ███████║██║███████╗   ██║      ██║      ██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║
-  ╚══════╝╚═╝╚══════╝   ╚═╝      ╚═╝      ╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝
+███████╗██╗██╗     ███████╗██╗   ██╗
+██╔════╝██║██║     ╚══███╔╝╚██╗ ██╔╝
+███████╗██║██║       ███╔╝  ╚████╔╝ 
+╚════██║██║██║      ███╔╝    ╚██╔╝  
+███████║██║███████╗███████╗   ██║   
+╚══════╝╚═╝╚══════╝╚══════╝   ╚═╝   
 ```
 
-## Features
+**A modern Neovim package manager — packer syntax, first-run wizard, live reload, and a built-in UI.**
 
-- **First-run wizard** — interactive language picker on first launch (Java, Python, Rust, Go, …)
-- **Bundled dashboard** — powered by `snacks.nvim` with working New File / Find File (Telescope) / Quit
-- **Bundled essentials** — Telescope + Neo-tree installed out of the box
-- **Lazy loading** — load plugins by event, filetype, or command
-- **Simple spec syntax** — `silzy.use { "owner/repo", ... }`
-- **Plugin status UI** — `:SilzyStatus` floating window
-- **One-line installer**
+![Neovim](https://img.shields.io/badge/Neovim-0.9+-green?logo=neovim&logoColor=white)
+![License](https://img.shields.io/github/license/SilpofGames/silzy.nvim)
+![GitHub Stars](https://img.shields.io/github/stars/SilpofGames/silzy.nvim?style=flat)
+
+</div>
 
 ---
 
-## Installation
+## Features
+
+- **First-run wizard** — multi-select language picker on first launch
+- **Packer.nvim syntax** — `use { "owner/repo", config = function() ... end }`
+- **Auto-installs LSPs and tools** per selected language
+- **Built-in dashboard** — auto-detects snacks.nvim if installed
+- **Plugin manager UI** — `<leader>pm` with Plugins / Colorschemes / Log tabs
+- **Colorscheme picker** — browse and apply colorschemes live, persists to file
+- **Live reload** — any change to `lua/core/` reloads Neovim automatically
+- **Bundled essentials** — Telescope, Neo-tree, Bufferline, Lualine, Aerial, snacks.nvim
+- **Native autopairs** — `(` → `()`, `{` → `{}`, `"` → `""` out of the box
+
+---
+
+## Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.sh | bash
 ```
 
-Then open Neovim:
-
-```bash
-nvim
-```
-
-The first-run wizard appears automatically. Pick your language and silzy installs everything.
+Then open Neovim — the first-run wizard appears automatically.
 
 ---
 
-## Manual Bootstrap (alternative)
+## First-run wizard
 
-Add this to the top of `~/.config/nvim/init.lua`:
+On first launch, a language picker appears. Press `Space` to toggle languages, `Enter` to confirm. You can select multiple languages.
 
-```lua
-local silzy_path = vim.fn.stdpath("data") .. "/silzy/manager"
-if vim.fn.empty(vim.fn.glob(silzy_path)) > 0 then
-  vim.fn.system({
-    "git", "clone", "--depth=1", "--filter=blob:none",
-    "https://github.com/SilpofGames/silzy.nvim.git",
-    silzy_path,
-  })
-end
-vim.opt.runtimepath:prepend(silzy_path)
-```
+| Key | Language | LSP | Plugin |
+|-----|----------|-----|--------|
+| `1` | C | clangd | [SilpofGames/c-dev](https://github.com/SilpofGames/c-dev) |
+| `2` | Go | gopls | [SilpofGames/go-dev](https://github.com/SilpofGames/go-dev) |
+| `3` | Java | jdtls | [SilpofGames/java-dev](https://github.com/SilpofGames/java-dev) |
+| `4` | Lua | lua_ls | [SilpofGames/lua-dev](https://github.com/SilpofGames/lua-dev) |
+| `5` | PHP | intelephense | [SilpofGames/php-dev](https://github.com/SilpofGames/php-dev) |
+| `6` | Python | pyright | [SilpofGames/py-dev](https://github.com/SilpofGames/py-dev) |
+| `7` | Ruby | solargraph | [SilpofGames/ruby-dev](https://github.com/SilpofGames/ruby-dev) |
+| `8` | Rust | rust-analyzer | [SilpofGames/rust-dev](https://github.com/SilpofGames/rust-dev) |
+| `9` | Web (HTML/CSS/JS) | html + cssls + ts_ls | [SilpofGames/web-dev](https://github.com/SilpofGames/web-dev) |
 
 ---
 
-## Usage
+## File structure         
 
-### Registering plugins
-
-```lua
-local silzy = require("silzy")
-
-silzy.setup({ auto_install = true })
-
--- Basic
-silzy.use { "folke/tokyonight.nvim" }
-
--- With config
-silzy.use {
-  "nvim-lualine/lualine.nvim",
-  config = function()
-    require("lualine").setup()
-  end,
-}
-
--- Lazy-load by event
-silzy.use {
-  "folke/todo-comments.nvim",
-  event = "BufReadPost",
-  config = function()
-    require("todo-comments").setup()
-  end,
-}
-
--- Lazy-load by filetype
-silzy.use {
-  "someone/markdown-preview.nvim",
-  ft = "markdown",
-}
-
--- Lazy-load by command
-silzy.use {
-  "someone/some-plugin.nvim",
-  cmd = "SomeCommand",
-}
-
--- With dependencies
-silzy.use {
-  "nvim-telescope/telescope.nvim",
-  dependencies = { "nvim-lua/plenary.nvim" },
-  config = function()
-    require("telescope").setup()
-  end,
-}
-
--- Pin to a tag (won't be updated)
-silzy.use {
-  "someone/stable-plugin.nvim",
-  tag = "v1.2.3",
-  pin = true,
-}
-
--- With a build step
-silzy.use {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
-}
-```
-
-### Organising plugins in files
-
-Put one plugin per file inside `lua/core/plugins/`:
-
-```
 ~/.config/nvim/
 ├── init.lua
 └── lua/
-    ├── config/
-    │   ├── options.lua
-    │   └── keymaps.lua
-    └── core/
-        ├── init.lua          ← auto-loads all files below
-        └── plugins/
-            ├── snacks.lua    ← bundled dashboard
-            ├── telescope.lua ← bundled finder
-            ├── neotree.lua   ← bundled file tree
-            └── mytheme.lua   ← your own plugins
-```
+├── config/
+│   ├── options.lua
+│   ├── keymaps.lua
+│   └── keybinds.lua     ← your custom keybinds (optional)
+└── core/
+├── init.lua
+├── plugins.lua      ← your plugins
+└── colorscheme.lua  ← your colorscheme
 
-Each file can either **return a spec table**:
+---
+
+## Plugin syntax
 
 ```lua
--- lua/core/plugins/mytheme.lua
-return {
-  "folke/tokyonight.nvim",
+use { "folke/which-key.nvim",
   config = function()
-    vim.cmd("colorscheme tokyonight")
+    require("which-key").setup()
+  end,
+}
+
+use { "ThePrimeagen/harpoon",
+  branch = "harpoon2",
+  requires = { "nvim-lua/plenary.nvim" },
+  config = function()
+    local harpoon = require("harpoon")
+    harpoon:setup()
+    vim.keymap.set("n", "<leader>ha", function() harpoon:list():add() end)
   end,
 }
 ```
 
-Or **call `silzy.use` directly**:
+Supported fields: `requires`, `branch`, `tag`, `run`, `as`, `config`, `init`, `event`, `cmd`, `ft`, `opt`, `pin`
+
+---
+
+## Colorscheme syntax
 
 ```lua
--- lua/core/plugins/tools.lua
-local silzy = require("silzy")
-silzy.use { "folke/which-key.nvim", event = "VeryLazy" }
-silzy.use { "lukas-reineke/indent-blankline.nvim" }
+use { "catppuccin/nvim",
+  as = "catppuccin",
+  config = function()
+    require("catppuccin").setup({ flavour = "mocha" })
+    vim.cmd("colorscheme catppuccin-mocha")
+  end,
+}
 ```
+
+```lua
+use { "sainnhe/everforest",
+  config = function()
+    vim.g.everforest_background = "hard"
+    vim.g.everforest_transparent_background = 2
+    vim.cmd("colorscheme everforest")
+  end,
+}
+```
+
+---
+
+## Custom keybinds
+
+```lua
+local map = function(mode, lhs, rhs, desc)
+  vim.keymap.set(mode, lhs, rhs, { desc = desc, silent = true, noremap = true })
+end
+
+map("n", "<leader>x", "<cmd>bd<CR>", "Close buffer")
+map("n", "<C-s>", "<cmd>w<CR>", "Save file")
+```
+
+---
+
+## Keymaps
+
+| Key | Action |
+|-----|--------|
+| `<leader>p` | Find files |
+| `<leader>g` | Live grep |
+| `<leader>r` | Recent files |
+| `<leader>b` | Buffers |
+| `<leader>e` | Toggle file explorer |
+| `<leader>a` | Toggle symbols panel |
+| `<leader>pm` | Open plugin manager |
+| `<leader>pr` | Reload config |
+| `<leader>ph` | Open dashboard |
+| `<C-t>` | Toggle terminal |
+| `<leader>z` | Zen mode |
+| `<leader>gl` | Lazygit |
+
+### Plugin manager (`<leader>pm`)
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Cycle tabs |
+| `i` | Install missing plugins |
+| `u` | Update all plugins |
+| `c` | Clean unused plugins |
+| `r` | Reload config |
+| `s` | Colorschemes tab |
+| `j` / `k` | Navigate colorschemes |
+| `Enter` | Apply colorscheme |
+| `q` | Close |
 
 ---
 
 ## Commands
 
-| Command | Description |
-|---|---|
-| `:SilzyInstall` | Install all missing plugins |
-| `:SilzyUpdate` | Update all installed plugins |
-| `:SilzyClean` | Remove plugins no longer registered |
-| `:SilzyStatus` | Open the plugin status window |
-| `:SilzySetup` | Re-run the first-run wizard |
-
-### Default keymaps
-
-| Key | Action |
-|---|---|
-| `<leader>pi` | Install plugins |
-| `<leader>pu` | Update plugins |
-| `<leader>pc` | Clean plugins |
-| `<leader>ps` | Plugin status |
-| `<leader>ff` | Find files (Telescope) |
-| `<leader>fg` | Live grep |
-| `<leader>e` | Toggle file tree (Neo-tree) |
-| `<C-t>` | Toggle terminal |
-| `<leader>z` | Zen mode |
+| Command | Action |
+|---------|--------|
+| `:SilzyInstall` | Install missing plugins |
+| `:SilzyUpdate` | Update all plugins |
+| `:SilzyClean` | Remove unused plugins |
+| `:SilzyOpen` | Open plugin manager UI |
+| `:SilzyReload` | Reload config |
+| `:SilzyDashboard` | Open dashboard |
 
 ---
 
-## Language presets
+## Bundled plugins
 
-The first-run wizard configures one of these presets automatically:
-
-| Language | LSP | Extras |
-|---|---|---|
-| Java | `jdtls` | neotest-java |
-| C / C++ | `clangd` | clangd_extensions, cmake-tools |
-| C# | `omnisharp` | csharp.nvim |
-| Python | `pyright` | venv-selector, nvim-dap-python |
-| Lua | `lua_ls` | lazydev.nvim |
-| JavaScript | `ts_ls` | package-info |
-| TypeScript | `ts_ls` | tsc.nvim, package-info |
-| Rust | `rust-analyzer` | rustaceanvim, crates.nvim |
-| Go | `gopls` | go.nvim |
-| Ruby | `solargraph` | nvim-dap-ruby |
-| Zig | `zls` | zig-tools.nvim |
-| Minimal | — | just LSP + Treesitter |
+- [folke/snacks.nvim](https://github.com/folke/snacks.nvim)
+- [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
+- [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)
+- [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
+- [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)
+- [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)
 
 ---
 
 ## Requirements
 
-- Neovim ≥ 0.9.0
+- Neovim ≥ 0.9
 - git
-- Recommended: `fd`, `ripgrep`, `lazygit`, a Nerd Font
+- Recommended: `fd`, `ripgrep`, `lazygit`, a [Nerd Font](https://www.nerdfonts.com)
 
 ---
 
 ## License
 
-MIT
+MIT — made by [SilpofGames](https://github.com/SilpofGames)
