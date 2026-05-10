@@ -23,11 +23,26 @@ local function box(str, w)
   return string.rep(" ", pad) .. str
 end
 
-local cs_state_path = vim.fn.stdpath("data") .. "/silzy/colorscheme.json"
-
 local function save_colorscheme(name)
-  vim.fn.mkdir(vim.fn.fnamemodify(cs_state_path, ":h"), "p")
-  vim.fn.writefile({ vim.fn.json_encode({ colorscheme = name }) }, cs_state_path)
+  local cs_file = vim.fn.stdpath("config") .. "/lua/core/colorscheme.lua"
+  if vim.fn.filereadable(cs_file) == 0 then return end
+
+  local lines = vim.fn.readfile(cs_file)
+  local new_lines = {}
+  local found = false
+
+  for _, line in ipairs(lines) do
+    if line:match('vim%.cmd%("colorscheme ') or line:match("vim%.cmd%('colorscheme ") then
+      table.insert(new_lines, string.format('    vim.cmd("colorscheme %s")', name))
+      found = true
+    else
+      table.insert(new_lines, line)
+    end
+  end
+
+  if found then
+    vim.fn.writefile(new_lines, cs_file)
+  end
 end
 
 local function get_installed_colorschemes()
