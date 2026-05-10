@@ -32,8 +32,10 @@ local function save_colorscheme(name)
   local found = false
 
   for _, line in ipairs(lines) do
-    if line:match('vim%.cmd%("colorscheme ') or line:match("vim%.cmd%('colorscheme ") then
-      table.insert(new_lines, string.format('    vim.cmd("colorscheme %s")', name))
+    local stripped = line:gsub("%s+", "")
+    if stripped:match('vim%.cmd%(["']colorscheme') then
+      local indent = line:match("^(%s*)")
+      table.insert(new_lines, indent .. string.format('vim.cmd("colorscheme %s")', name))
       found = true
     else
       table.insert(new_lines, line)
@@ -42,6 +44,8 @@ local function save_colorscheme(name)
 
   if found then
     vim.fn.writefile(new_lines, cs_file)
+  else
+    vim.notify("[silzy] Could not find colorscheme line in colorscheme.lua", vim.log.levels.WARN)
   end
 end
 
