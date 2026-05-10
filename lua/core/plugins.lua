@@ -131,3 +131,91 @@ use { "nvim-neo-tree/neo-tree.nvim",
     })
   end,
 }
+
+use { "akinsho/bufferline.nvim",
+  requires = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("bufferline").setup({
+      options = {
+        mode              = "buffers",
+        separator_style   = "slant",
+        always_show_bufferline = true,
+        show_buffer_close_icons = true,
+        show_close_icon   = false,
+        color_icons       = true,
+        diagnostics       = "nvim_lsp",
+        offsets = {
+          {
+            filetype   = "neo-tree",
+            text       = "  Files",
+            highlight  = "Directory",
+            separator  = true,
+          },
+        },
+      },
+    })
+  end,
+}
+
+use { "stevearc/aerial.nvim",
+  requires = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("aerial").setup({
+      on_attach = function(bufnr)
+        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Prev symbol" })
+        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Next symbol" })
+      end,
+      layout = {
+        max_width     = { 40, 0.2 },
+        min_width     = 30,
+        default_direction = "right",
+        placement     = "edge",
+      },
+      attach_mode   = "global",
+      backends      = { "treesitter", "lsp" },
+      show_guides   = true,
+      guides = {
+        mid_item   = "├─ ",
+        last_item  = "└─ ",
+        nested_top = "│  ",
+        whitespace = "   ",
+      },
+      filter_kind = {
+        "Class", "Constructor", "Enum", "Function",
+        "Interface", "Module", "Method", "Struct",
+      },
+    })
+    vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle<CR>", { desc = "Toggle Symbols" })
+  end,
+}
+
+use { "nvim-lualine/lualine.nvim",
+  requires = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("lualine").setup({
+      options = {
+        theme            = "auto",
+        globalstatus     = true,
+        component_separators = { left = "", right = "" },
+        section_separators  = { left = "", right = "" },
+      },
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", "diff", "diagnostics" },
+        lualine_c = { { "filename", path = 1 } },
+        lualine_x = { "encoding", "fileformat", "filetype" },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      },
+    })
+  end,
+}
+
+use { "lukas-reineke/indent-blankline.nvim",
+  config = function()
+    require("ibl").setup({
+      indent = { char = "│" },
+      scope  = { enabled = true },
+    })
+  end,
+}

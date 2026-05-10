@@ -99,3 +99,17 @@ vim.keymap.set("i", "<BS>", function()
   end
   return "<BS>"
 end, { expr = true, silent = true })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    if vim.fn.argc() > 0 then
+      vim.defer_fn(function()
+        local ok_neo = pcall(vim.cmd, "Neotree show")
+        local ok_aerial = pcall(vim.cmd, "AerialOpen")
+        if ok_aerial then
+          vim.cmd("wincmd p")
+        end
+      end, 100)
+    end
+  end,
+})
