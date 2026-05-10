@@ -3,7 +3,7 @@ local M = {}
 local presets = {
 
   c = function(use)
-    use { "silpof/c-dev.nvim",
+    use { "SilpofGames/c-dev",
       config = function()
         require("c-dev").setup({
           compiler = "gcc",
@@ -56,7 +56,7 @@ local presets = {
   end,
 
   go = function(use)
-    use { "silpof/go-dev.nvim",
+    use { "SilpofGames/go-dev",
       config = function() require("go-dev").setup() end,
     }
     use { "neovim/nvim-lspconfig",
@@ -65,14 +65,14 @@ local presets = {
   end,
 
   java = function(use)
-    use { "silpof/java-dev.nvim",
+    use { "SilpofGames/java-dev",
       config = function() require("java-dev").setup() end,
     }
     use { "mfussenegger/nvim-jdtls" }
   end,
 
   lua = function(use)
-    use { "silpof/lua-dev.nvim",
+    use { "SilpofGames/lua-dev",
       config = function() require("lua-dev").setup() end,
     }
     use { "neovim/nvim-lspconfig",
@@ -90,7 +90,7 @@ local presets = {
   end,
 
   php = function(use)
-    use { "silpof/php-dev.nvim",
+    use { "SilpofGames/php-dev",
       config = function() require("php-dev").setup() end,
     }
     use { "neovim/nvim-lspconfig",
@@ -99,7 +99,7 @@ local presets = {
   end,
 
   python = function(use)
-    use { "silpof/py-dev.nvim",
+    use { "SilpofGames/py-dev",
       config = function()
         require("py-dev").setup({ python_cmd = "python3", venv_name = ".venv" })
       end,
@@ -126,7 +126,7 @@ local presets = {
   end,
 
   ruby = function(use)
-    use { "silpof/ruby-dev.nvim",
+    use { "SilpofGames/ruby-dev",
       config = function() require("ruby-dev").setup() end,
     }
     use { "neovim/nvim-lspconfig",
@@ -135,7 +135,7 @@ local presets = {
   end,
 
   rust = function(use)
-    use { "silpof/rust-dev.nvim",
+    use { "SilpofGames/rust-dev",
       config = function() require("rust-dev").setup() end,
     }
     use { "neovim/nvim-lspconfig",
@@ -150,7 +150,7 @@ local presets = {
   end,
 
   web = function(use)
-    use { "silpof/web-dev.nvim",
+    use { "SilpofGames/web-dev",
       config = function()
         require("web-dev").setup({ port = 3000 })
       end,
