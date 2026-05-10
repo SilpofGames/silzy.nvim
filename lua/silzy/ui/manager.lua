@@ -33,7 +33,7 @@ local function save_colorscheme(name)
 
   for _, line in ipairs(lines) do
     local stripped = line:gsub("%s+", "")
-    if stripped:match('vim%.cmd%(["']colorscheme') then
+    if stripped:match("vim%.cmd%(") and stripped:match("colorscheme") then
       local indent = line:match("^(%s*)")
       table.insert(new_lines, indent .. string.format('vim.cmd("colorscheme %s")', name))
       found = true
