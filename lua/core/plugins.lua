@@ -90,13 +90,23 @@ use { "nvim-neo-tree/neo-tree.nvim",
       popup_border_style   = "rounded",
       enable_git_status    = true,
       enable_diagnostics   = true,
+      use_popups_for_input = true,
+      source_selector = {
+        winbar          = false,
+        statusline      = false,
+      },
       default_component_configs = {
         indent = {
           indent_size = 2, padding = 1, with_markers = true,
           indent_marker = "│", last_indent_marker = "└",
           expander_collapsed = "", expander_expanded = "",
         },
-        icon = { folder_closed = "", folder_open = "", folder_empty = "" },
+        icon = {
+          folder_closed = " ",
+          folder_open   = " ",
+          folder_empty  = " ",
+          default       = " ",
+        },
         git_status = {
           symbols = {
             added = "✚", modified = "", deleted = "✖", renamed = "",
@@ -122,11 +132,23 @@ use { "nvim-neo-tree/neo-tree.nvim",
       },
       filesystem = {
         filtered_items = {
-          visible = true, hide_dotfiles = false,
-          hide_gitignored = false, hide_hidden = false,
+          visible         = true,
+          hide_dotfiles   = false,
+          hide_gitignored = false,
+          hide_hidden     = false,
         },
         follow_current_file    = { enabled = true },
         use_libuv_file_watcher = true,
+        bind_to_cwd            = true,
+        cwd_target = {
+          sidebar   = "tab",
+          current   = "window",
+        },
+      },
+      name = {
+        trailing_slash    = false,
+        use_git_status_colors = true,
+        highlight         = "NeoTreeFileName",
       },
     })
   end,
@@ -192,20 +214,53 @@ use { "stevearc/aerial.nvim",
 use { "nvim-lualine/lualine.nvim",
   requires = { "nvim-tree/nvim-web-devicons" },
   config = function()
+    local function lsp_name()
+      local clients = vim.lsp.get_clients({ bufnr = 0 })
+      if #clients == 0 then return "" end
+      return " " .. clients[1].name
+    end
+
     require("lualine").setup({
       options = {
         theme            = "auto",
         globalstatus     = true,
         component_separators = { left = "", right = "" },
         section_separators  = { left = "", right = "" },
+        disabled_filetypes  = { statusline = { "dashboard", "silzy-dashboard" } },
       },
       sections = {
-        lualine_a = { "mode" },
-        lualine_b = { "branch", "diff", "diagnostics" },
-        lualine_c = { { "filename", path = 1 } },
-        lualine_x = { "encoding", "fileformat", "filetype" },
+        lualine_a = {
+          { "mode", separator = { left = "" }, right_padding = 2 },
+        },
+        lualine_b = {
+          { "branch", icon = "" },
+          { "diff",
+            symbols = { added = " ", modified = " ", removed = " " },
+          },
+        },
+        lualine_c = {
+          { "filename", path = 1, symbols = { modified = "  ", readonly = "  " } },
+        },
+        lualine_x = {
+          { "diagnostics",
+            sources = { "nvim_lsp" },
+            symbols = { error = " ", warn = " ", info = " ", hint = " " },
+          },
+          { lsp_name },
+          { "filetype", icon_only = false },
+        },
         lualine_y = { "progress" },
-        lualine_z = { "location" },
+        lualine_z = {
+          { "location", separator = { right = "" }, left_padding = 2 },
+        },
+      },
+      inactive_sections = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = { "filename" },
+        lualine_x = { "location" },
+        lualine_y = {},
+        lualine_z = {},
       },
     })
   end,
