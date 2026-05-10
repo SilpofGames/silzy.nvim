@@ -63,17 +63,17 @@ On first launch, a language picker appears. Press `Space` to toggle languages, `
 
 ## File structure         
 
-~/.config/nvim/
-├── init.lua
-└── lua/
-├── config/
-│   ├── options.lua
-│   ├── keymaps.lua
-│   └── keybinds.lua     ← your custom keybinds (optional)
-└── core/
-├── init.lua
-├── plugins.lua      ← your plugins
-└── colorscheme.lua  ← your colorscheme
+~/.config/nvim/                                                                                       
+├── init.lua                                                        
+└── lua/                                                       
+├── config/                                                       
+│   ├── options.lua                                                       
+│   ├── keymaps.lua                                                       
+│   └── keybinds.lua     ← your custom keybinds (optional)                                                       
+└── core/                                                       
+├── init.lua                                                       
+├── plugins.lua      ← your plugins                                                       
+└── colorscheme.lua  ← your colorscheme                                                       
 
 ---
 
