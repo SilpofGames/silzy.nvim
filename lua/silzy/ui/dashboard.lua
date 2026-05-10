@@ -1,32 +1,31 @@
 local M = {}
 
 local header = {
-  "                           ",
-  "  ▄▄▄▄▄     ▄▄             ",
-  " ██▀▀▀▀█▄    ██            ",
-  " ▀██▄  ▄▀ ▀▀ ██            ",
-  "   ▀██▄▄  ██ ██ ▀▀▀██ ██ ██",
-  " ▄   ▀██▄ ██ ██   ▄█▀ ██▄██",
-  " ▀█████▀▄██▄██▄▄██▄▄▄▄▀██▀",
-  "                        ██ ",
-  "                      ▀▀▀  ",
+      "                                                                     ",
+      "       ████ ██████           █████      ██                     ",
+      "      ███████████             █████                             ",
+      "      █████████ ███████████████████ ███   ███████████   ",
+      "     █████████  ███    █████████████ █████ ██████████████   ",
+      "    █████████ ██████████ █████████ █████ █████ ████ █████   ",
+      "  ███████████ ███    ███ █████████ █████ █████ ████ █████  ",
+      " ██████  █████████████████████ ████ █████ █████ ████ ██████ ",
 }
 
 local snacks_keys = {
-  { icon = " ", key = "n", desc = "New File",    action = function() vim.cmd("enew") end },
-  { icon = " ", key = "f", desc = "Find File",   action = function()
+  { icon = "[λ]", key = "n", desc = "New File",    action = function() vim.cmd("enew") end },
+  { icon = "[μ]", key = "f", desc = "Find File",   action = function()
       vim.defer_fn(function()
         local ok, b = pcall(require, "telescope.builtin")
         if ok then b.find_files({ hidden = true }) end
       end, 50)
     end },
-  { icon = " ", key = "r", desc = "Recent Files", action = function()
+  { icon = "[τ]", key = "r", desc = "Recent Files", action = function()
       vim.defer_fn(function()
         local ok, b = pcall(require, "telescope.builtin")
         if ok then b.oldfiles({ include_current_session = true }) end
       end, 50)
     end },
-  { icon = " ", key = "q", desc = "Quit",         action = function() vim.cmd("qa") end },
+  { icon = "[σ]", key = "q", desc = "Quit",         action = function() vim.cmd("qa") end },
 }
 
 local function center(str, width)
