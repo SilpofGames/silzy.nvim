@@ -1,12 +1,15 @@
 <div align="center">
 
 ```
-███████╗██╗██╗     ███████╗██╗   ██╗    ███╗   ██╗██╗   ██╗██╗███╗   ███╗
-██╔════╝██║██║     ╚══███╔╝╚██╗ ██╔╝    ████╗  ██║██║   ██║██║████╗ ████║
-███████╗██║██║       ███╔╝  ╚████╔╝     ██╔██╗ ██║██║   ██║██║██╔████╔██║
-╚════██║██║██║      ███╔╝    ╚██╔╝      ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║
-███████║██║███████╗███████╗   ██║       ██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║
-╚══════╝╚═╝╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝
+                           
+  ▄▄▄▄▄     ▄▄             
+ ██▀▀▀▀█▄    ██            
+ ▀██▄  ▄▀ ▀▀ ██            
+   ▀██▄▄  ██ ██ ▀▀▀██ ██ ██
+ ▄   ▀██▄ ██ ██   ▄█▀ ██▄██
+ ▀██████▀▄██▄██▄▄██▄▄▄▄▀██▀
+                        ██ 
+                      ▀▀▀  
 ```
 
 **A modern Neovim package manager — packer syntax, first-run wizard, live reload, and a built-in UI.**
@@ -35,8 +38,16 @@
 
 ## Install
 
+**Linux / macOS:**
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.ps1 | iex
 ```
 
 Then open Neovim — the first-run wizard appears automatically.
@@ -46,6 +57,8 @@ Then open Neovim — the first-run wizard appears automatically.
 ## First-run wizard
 
 On first launch, a language picker appears. Press `Space` to toggle languages, `Enter` to confirm. You can select multiple languages.
+
+**Available languages:**
 
 | Key | Language | LSP | Plugin |
 |-----|----------|-----|--------|
@@ -61,28 +74,39 @@ On first launch, a language picker appears. Press `Space` to toggle languages, `
 
 ---
 
-## File structure         
+## File structure
 
-~/.config/nvim/                                                                                       
-├── init.lua                                                        
-└── lua/                                                       
-├── config/                                                       
-│   ├── options.lua                                                       
-│   ├── keymaps.lua                                                       
-│   └── keybinds.lua     ← your custom keybinds (optional)                                                       
-└── core/                                                       
-├── init.lua                                                       
-├── plugins.lua      ← your plugins                                                       
-└── colorscheme.lua  ← your colorscheme                                                       
+```
+~/.config/nvim/
+├── init.lua                 ← entry point
+└── lua/
+    ├── config/
+    │   ├── options.lua      ← editor options and autopairs
+    │   ├── keymaps.lua      ← global keymaps
+    │   └── keybinds.lua     ← your custom keybinds (optional)
+    └── core/
+        ├── init.lua         ← loads plugins.lua and colorscheme.lua
+        ├── plugins.lua      ← your plugins
+        └── colorscheme.lua  ← your colorscheme
+```
 
 ---
 
 ## Plugin syntax
 
+`lua/core/plugins.lua` uses packer.nvim-compatible syntax:
+
 ```lua
 use { "folke/which-key.nvim",
   config = function()
     require("which-key").setup()
+  end,
+}
+
+use { "nvim-lualine/lualine.nvim",
+  requires = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("lualine").setup({ options = { theme = "auto" } })
   end,
 }
 
@@ -103,6 +127,8 @@ Supported fields: `requires`, `branch`, `tag`, `run`, `as`, `config`, `init`, `e
 
 ## Colorscheme syntax
 
+`lua/core/colorscheme.lua`:
+
 ```lua
 use { "catppuccin/nvim",
   as = "catppuccin",
@@ -119,6 +145,22 @@ use { "sainnhe/everforest",
     vim.g.everforest_background = "hard"
     vim.g.everforest_transparent_background = 2
     vim.cmd("colorscheme everforest")
+    local groups = {
+      "Normal", "NormalNC", "NormalFloat", "SignColumn",
+      "StatusLine", "EndOfBuffer", "LineNr",
+    }
+    for _, g in ipairs(groups) do
+      vim.api.nvim_set_hl(0, g, { bg = "NONE", ctermbg = "NONE" })
+    end
+  end,
+}
+```
+
+```lua
+use { "ellisonleao/gruvbox.nvim",
+  config = function()
+    require("gruvbox").setup({ contrast = "hard" })
+    vim.cmd("colorscheme gruvbox")
   end,
 }
 ```
@@ -126,6 +168,8 @@ use { "sainnhe/everforest",
 ---
 
 ## Custom keybinds
+
+Add your own keybinds in `lua/config/keybinds.lua` — it's loaded automatically:
 
 ```lua
 local map = function(mode, lhs, rhs, desc)
@@ -140,34 +184,49 @@ map("n", "<C-s>", "<cmd>w<CR>", "Save file")
 
 ## Keymaps
 
+### Navigation
+
 | Key | Action |
 |-----|--------|
-| `<leader>p` | Find files |
+| `<leader>p` | Find files (Telescope) |
 | `<leader>g` | Live grep |
 | `<leader>r` | Recent files |
 | `<leader>b` | Buffers |
-| `<leader>e` | Toggle file explorer |
-| `<leader>a` | Toggle symbols panel |
-| `<leader>pm` | Open plugin manager |
-| `<leader>pr` | Reload config |
-| `<leader>ph` | Open dashboard |
-| `<C-t>` | Toggle terminal |
-| `<leader>z` | Zen mode |
-| `<leader>gl` | Lazygit |
+| `<leader>e` | Toggle file explorer (Neo-tree) |
+| `<leader>a` | Toggle symbols panel (Aerial) |
 
-### Plugin manager (`<leader>pm`)
+### silzy.nvim
 
 | Key | Action |
 |-----|--------|
-| `Tab` | Cycle tabs |
+| `<leader>pm` | Open plugin manager |
+| `<leader>pr` | Reload config |
+| `<leader>ph` | Open dashboard |
+
+### Plugin manager UI (`<leader>pm`)
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Cycle tabs (Plugins → Colorschemes → Log) |
 | `i` | Install missing plugins |
 | `u` | Update all plugins |
 | `c` | Clean unused plugins |
 | `r` | Reload config |
-| `s` | Colorschemes tab |
-| `j` / `k` | Navigate colorschemes |
-| `Enter` | Apply colorscheme |
+| `s` | Go to Colorschemes tab |
+| `j` / `k` | Navigate (in Colorschemes tab) |
+| `Enter` | Apply colorscheme (writes to colorscheme.lua) |
 | `q` | Close |
+
+### Snacks.nvim
+
+| Key | Action |
+|-----|--------|
+| `<C-t>` | Toggle terminal |
+| `<leader>z` | Zen mode |
+| `<leader>dd` | Dim mode |
+| `<leader>gb` | Git browse |
+| `<leader>gl` | Lazygit |
+| `<leader>rn` | Rename file |
 
 ---
 
@@ -186,13 +245,15 @@ map("n", "<C-s>", "<cmd>w<CR>", "Save file")
 
 ## Bundled plugins
 
-- [folke/snacks.nvim](https://github.com/folke/snacks.nvim)
-- [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
-- [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
-- [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)
-- [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
-- [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)
-- [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)
+Installed automatically with silzy.nvim:
+
+- **[folke/snacks.nvim](https://github.com/folke/snacks.nvim)** — dashboard, terminal, zen, notifier, git browse
+- **[nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)** — fuzzy finder
+- **[nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)** — file explorer
+- **[akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)** — buffer tabs
+- **[nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** — statusline
+- **[stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)** — symbols/outline panel
+- **[lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)** — indent guides
 
 ---
 
