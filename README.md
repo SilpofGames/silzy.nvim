@@ -27,12 +27,36 @@
 - **First-run wizard** — multi-select language picker on first launch
 - **Packer.nvim syntax** — `use { "owner/repo", config = function() ... end }`
 - **Auto-installs LSPs and tools** per selected language
-- **Built-in dashboard** — auto-detects snacks.nvim if installed
+- **Custom dashboards** — supports native, [snacks.nvim](https://github.com/folke/snacks.nvim), and [alpha-nvim](https://github.com/goolord/alpha-nvim)
 - **Plugin manager UI** — `<leader>pm` with Plugins / Colorschemes / Log tabs
-- **Colorscheme picker** — browse and apply colorschemes live, persists to file
+- **Colorscheme picker** — browse and apply colorschemes live with color previews (● ● ●), persists to file
+- **Modern status bar** — Catppuccin "pill" style with sharp separators (`|`, ``, `>`)
+- **Command Autocomplete** — built-in completion for commands and paths via `nvim-cmp`
 - **Live reload** — any change to `lua/core/` reloads Neovim automatically
-- **Bundled essentials** — Telescope, Neo-tree, Bufferline, Lualine, Aerial, snacks.nvim
+- **Bundled essentials** — Telescope, Neo-tree, Bufferline, Lualine, Aerial, snacks.nvim, alpha-nvim
 - **Native autopairs** — `(` → `()`, `{` → `{}`, `"` → `""` out of the box
+
+---
+
+## Configuration
+
+You can customize silzy.nvim behavior in your `init.lua`:
+
+```lua
+local silzy = require("silzy")
+
+silzy.setup({ 
+  auto_install = true, 
+  dashboard    = "auto", -- Options: "auto", "snacks", "alpha", "native"
+  fetch        = true,   -- Show system info (fastfetch/neofetch) in snacks dashboard
+})
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `auto_install` | `true` | Automatically install missing plugins on startup |
+| `dashboard` | `"auto"` | Preferred dashboard plugin. "auto" prefers snacks > alpha > native |
+| `fetch` | `true` | Enable/Disable system info (terminal section) in snacks dashboard |
 
 ---
 
