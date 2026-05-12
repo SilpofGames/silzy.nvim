@@ -239,47 +239,36 @@ use { "nvim-lualine/lualine.nvim",
       options = {
         theme            = "catppuccin",
         globalstatus     = true,
-        component_separators = "",
-        section_separators  = "",
+        component_separators = { left = ">", right = "<" },
+        section_separators  = { left = "", right = "" },
         disabled_filetypes  = { statusline = { "dashboard", "silzy-dashboard", "alpha" } },
       },
       sections = {
         lualine_a = {
-          { "mode", separator = { left = "", right = "" }, right_padding = 2 },
+          { function() return "|" end, padding = { left = 0, right = 0 } },
+          { "mode", padding = { left = 1, right = 1 } },
         },
         lualine_b = {
           { "filename", 
             color = { bg = colors.grey, fg = colors.white },
-            separator = { left = "", right = "" } 
           },
-        },
-        lualine_c = {
           { "branch", icon = " ", 
             color = { bg = colors.dark, fg = colors.white },
-            separator = { left = "", right = "" } 
           },
         },
+        lualine_c = { "%=" },
         lualine_x = {
-          { "diagnostics", 
-            separator = { left = "", right = "" },
-            color = { bg = colors.dark }
-          },
+          { "diagnostics", color = { bg = colors.dark } },
           { lsp_name, icon = " ", 
             color = { bg = colors.grey, fg = colors.blue },
-            separator = { left = "", right = "" } 
           },
         },
         lualine_y = {
-          { "filetype", 
-            color = { bg = colors.dark, fg = colors.white },
-            separator = { left = "", right = "" } 
-          },
+          { "filetype", color = { bg = colors.dark, fg = colors.white } },
         },
         lualine_z = {
-          { "location", 
-            color = { bg = colors.blue, fg = colors.black },
-            separator = { left = "", right = "" } 
-          },
+          { "location", color = { bg = colors.blue, fg = colors.black } },
+          { function() return "|" end, padding = { left = 0, right = 0 } },
         },
       },
       inactive_sections = {
