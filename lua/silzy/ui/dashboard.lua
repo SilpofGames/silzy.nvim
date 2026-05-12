@@ -214,31 +214,25 @@ local function open_with_alpha()
 end
 
 function M.setup()
+  -- If an external dashboard is active, we don't even create the autocommands
+  local has_snacks = pcall(require, "snacks.dashboard")
+  local has_alpha = pcall(require, "alpha")
+  
+  local config = require("silzy").config or {}
+  local preferred = config.dashboard or "auto"
+
+  if preferred == "snacks" or (preferred == "auto" and has_snacks) then
+    return
+  end
+  if preferred == "alpha" or (preferred == "auto" and has_alpha) then
+    return
+  end
+
   vim.api.nvim_create_autocmd("VimEnter", {
     once     = true,
     callback = function()
       if vim.fn.argc() > 0 then return end
-      
-      -- Check if we should even try to open the native one
-      local config = require("silzy").config or {}
-      local preferred = config.dashboard or "auto"
-      
-      if preferred == "native" then
-        return open_native()
-      end
-      
-      if preferred == "auto" then
-        local has_snacks = pcall(require, "snacks.dashboard")
-        local has_alpha = pcall(require, "alpha")
-        if not has_snacks and not has_alpha then
-          return open_native()
-        end
-      end
-
-      -- If we are here, we let the external dashboard or M.open() handle it
-      vim.schedule(function()
-        M.open()
-      end)
+      open_native()
     end,
   })
 end

@@ -54,7 +54,7 @@ use { "folke/snacks.nvim",
       local cmds = { "fastfetch", "neofetch", "screenfetch" }
       for _, c in ipairs(cmds) do
         if vim.fn.executable(c) == 1 then
-          if c == "fastfetch" then return "fastfetch --raw" end
+          if c == "fastfetch" then return "fastfetch --pipe" end
           if c == "neofetch" then return "neofetch --off" end
           return c
         end
