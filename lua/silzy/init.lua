@@ -301,8 +301,11 @@ function M.setup(opts)
   ensure_dirs()
 
   local snacks_dir  = bootstrap_sync("folke/snacks.nvim")
+  local alpha_dir   = bootstrap_sync("goolord/alpha-nvim")
   local plenary_dir = bootstrap_sync("nvim-lua/plenary.nvim")
+  
   if snacks_dir  then add_to_rtp(snacks_dir)  end
+  if alpha_dir   then add_to_rtp(alpha_dir)   end
   if plenary_dir then add_to_rtp(plenary_dir) end
 
   vim.api.nvim_create_user_command("SilzyInstall",   function() M.install() end, {})

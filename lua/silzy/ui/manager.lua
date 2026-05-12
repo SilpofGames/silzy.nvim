@@ -182,28 +182,29 @@ local function render()
           if cs.name:lower():match(name) then palette = p; break end
         end
         
-        local preview = "█ █ █ "
+        local preview = "● ● ● "
         local line = string.format("%s%s%-32s  %s", prefix, preview, cs.name, cs.plugin)
         push(line)
         
         local lnum = #lines - 1
         local start_col = #prefix
         
-        -- Add highlights for the 3 blocks
+        -- Add highlights for the 3 circles
         for j = 1, 3 do
           local group = "SilzyCSColor" .. i .. "_" .. j
           api.nvim_set_hl(0, group, { fg = palette[j] })
-          hl(lnum, group, start_col + (j-1)*2, start_col + (j-1)*2 + 3)
+          -- Each circle is 3 bytes in UTF-8 (●), plus a space
+          hl(lnum, group, start_col + (j-1)*4, start_col + (j-1)*4 + 3)
         end
 
         if is_cursor and is_active then
-          hl(lnum, "Title", start_col + 6)
+          hl(lnum, "Title", start_col + 12)
         elseif is_cursor then
-          hl(lnum, "PmenuSel", start_col + 6)
+          hl(lnum, "PmenuSel", start_col + 12)
         elseif is_active then
-          hl(lnum, "DiagnosticOk", start_col + 6)
+          hl(lnum, "DiagnosticOk", start_col + 12)
         else
-          hl(lnum, "Normal", start_col + 6)
+          hl(lnum, "Normal", start_col + 12)
         end
       end
     end

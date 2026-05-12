@@ -197,6 +197,8 @@ local function open_with_alpha()
   local ok, alpha = pcall(require, "alpha")
   if not ok then return open_native() end
   local dashboard = require("alpha.themes.dashboard")
+  
+  -- Clear existing header to avoid duplicates if re-opened
   dashboard.section.header.val = header
   dashboard.section.buttons.val = {
     dashboard.button("n", "  New File",     ":enew<CR>"),
@@ -204,8 +206,11 @@ local function open_with_alpha()
     dashboard.button("r", "  Recent Files", ":Telescope oldfiles<CR>"),
     dashboard.button("q", "  Quit",         ":qa<CR>"),
   }
+  dashboard.section.footer.val = { " ", "silzy.nvim" }
+  dashboard.section.footer.opts.hl = "Comment"
+  
   alpha.setup(dashboard.opts)
-  pcall(vim.cmd, "Alpha")
+  vim.cmd("Alpha")
 end
 
 function M.setup()

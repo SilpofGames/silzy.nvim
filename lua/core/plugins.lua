@@ -232,47 +232,54 @@ use { "nvim-lualine/lualine.nvim",
       red    = "#f38ba8",
       violet = "#cba6f7",
       grey   = "#313244",
-    }
-
-    local bubbles_theme = {
-      normal = {
-        a = { fg = colors.black, bg = colors.blue },
-        b = { fg = colors.white, bg = colors.grey },
-        c = { fg = colors.white },
-      },
-      insert = { a = { fg = colors.black, bg = colors.red } },
-      visual = { a = { fg = colors.black, bg = colors.cyan } },
-      replace = { a = { fg = colors.black, bg = colors.red } },
-      inactive = {
-        a = { fg = colors.white, bg = colors.black },
-        b = { fg = colors.white, bg = colors.black },
-        c = { fg = colors.white },
-      },
+      dark   = "#1e1e2e",
     }
 
     require("lualine").setup({
       options = {
-        theme            = bubbles_theme,
+        theme            = "catppuccin",
         globalstatus     = true,
         component_separators = "",
-        section_separators  = { left = "", right = "" },
-        disabled_filetypes  = { statusline = { "dashboard", "silzy-dashboard" } },
+        section_separators  = "",
+        disabled_filetypes  = { statusline = { "dashboard", "silzy-dashboard", "alpha" } },
       },
       sections = {
-        lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
-        lualine_b = { 
-          { "filename", separator = { right = "" } },
-          { "branch", icon = "  ", separator = { left = "", right = "" } },
+        lualine_a = {
+          { "mode", separator = { left = "", right = "" }, right_padding = 2 },
         },
-        lualine_c = { "%=" },
+        lualine_b = {
+          { "filename", 
+            color = { bg = colors.grey, fg = colors.white },
+            separator = { left = "", right = "" } 
+          },
+        },
+        lualine_c = {
+          { "branch", icon = " ", 
+            color = { bg = colors.dark, fg = colors.white },
+            separator = { left = "", right = "" } 
+          },
+        },
         lualine_x = {
-          { lsp_name, icon = " ", separator = { left = "", right = "" } },
+          { "diagnostics", 
+            separator = { left = "", right = "" },
+            color = { bg = colors.dark }
+          },
+          { lsp_name, icon = " ", 
+            color = { bg = colors.grey, fg = colors.blue },
+            separator = { left = "", right = "" } 
+          },
         },
         lualine_y = {
-          { "filetype", separator = { left = "", right = "" } },
+          { "filetype", 
+            color = { bg = colors.dark, fg = colors.white },
+            separator = { left = "", right = "" } 
+          },
         },
         lualine_z = {
-          { "location", separator = { left = "", right = "" }, left_padding = 2 },
+          { "location", 
+            color = { bg = colors.blue, fg = colors.black },
+            separator = { left = "", right = "" } 
+          },
         },
       },
       inactive_sections = {
