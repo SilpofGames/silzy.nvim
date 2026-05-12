@@ -2,6 +2,52 @@ use { "goolord/alpha-nvim",
   requires = { "nvim-tree/nvim-web-devicons" },
 }
 
+use { "hrsh7th/nvim-cmp",
+  requires = {
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-path",
+    "hrsh7th/cmp-cmdline",
+    "L3MON4D3/LuaSnip",
+    "saadparwaiz1/cmp_luasnip",
+  },
+  config = function()
+    local cmp = require("cmp")
+    cmp.setup({
+      snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
+      mapping = cmp.mapping.preset.insert({
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then cmp.select_next_item()
+          elseif require("luasnip").expand_or_jumpable() then require("luasnip").expand_or_jump()
+          else fallback() end
+        end, { "i", "s" }),
+      }),
+      sources = cmp.config.sources({
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+      }, {
+        { name = "buffer" },
+        { name = "path" },
+      })
+    })
+
+    -- Cmdline completion
+    cmp.setup.cmdline(":", {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources({
+        { name = "path" }
+      }, {
+        { name = "cmdline" }
+      })
+    })
+  end
+}
+
 use { "folke/snacks.nvim",
   config = function()
     require("snacks").setup({
@@ -20,6 +66,20 @@ use { "folke/snacks.nvim",
       quickfile    = { enabled = true },
       picker       = { enabled = false },
       rename       = { enabled = true },
+      dashboard    = {
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          { section = "startup" },
+          {
+            section = "terminal",
+            cmd = "fortune -s | cowsay",
+            hl = "header",
+            padding = 1,
+            indent = 8,
+          },
+        },
+      },
     })
     local map = function(lhs, fn, desc, mode)
       vim.keymap.set(mode or "n", lhs, fn, { desc = desc, silent = true })
