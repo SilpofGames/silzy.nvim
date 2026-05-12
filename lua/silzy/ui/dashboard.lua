@@ -214,20 +214,38 @@ local function open_with_alpha()
 end
 
 function M.setup()
-  -- If an external dashboard is active, we don't even create the autocommands
-  local has_snacks = pcall(require, "snacks.dashboard")
-  local has_alpha = pcall(require, "alpha")
-  
   local config = require("silzy").config or {}
   local preferred = config.dashboard or "auto"
 
-  if preferred == "snacks" or (preferred == "auto" and has_snacks) then
-    return
-  end
-  if preferred == "alpha" or (preferred == "auto" and has_alpha) then
+  -- If explicitly native, setup the autocmd
+  if preferred == "native" then
+    vim.api.nvim_create_autocmd("VimEnter", {
+      once     = true,
+      callback = function()
+        if vim.fn.argc() > 0 then return end
+        open_native()
+      end,
+    })
     return
   end
 
+  -- For "auto" or external dashboards, we check if they are installed/available
+  -- without using 'require' to avoid module loading loops
+  local install_path = vim.fn.stdpath("data") .. "/silzy/plugins"
+  local has_snacks = vim.fn.isdirectory(install_path .. "/folke-snacks.nvim") == 1
+  local has_alpha  = vim.fn.isdirectory(install_path .. "/goolord-alpha-nvim") == 1
+
+  if preferred == "snacks" or (preferred == "auto" and has_snacks) then
+    -- Snacks handles its own dashboard on VimEnter
+    return
+  end
+
+  if preferred == "alpha" or (preferred == "auto" and has_alpha) then
+    -- Alpha handles its own setup
+    return
+  end
+
+  -- Fallback to native if nothing else found
   vim.api.nvim_create_autocmd("VimEnter", {
     once     = true,
     callback = function()
