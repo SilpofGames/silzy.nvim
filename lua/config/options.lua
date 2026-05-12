@@ -43,6 +43,8 @@ opt.fileencoding   = "utf-8"
 
 opt.clipboard      = "unnamedplus"
 
+opt.fillchars      = { eob = " " }
+
 opt.foldmethod     = "expr"
 opt.foldexpr       = "nvim_treesitter#foldexpr()"
 opt.foldenable     = false

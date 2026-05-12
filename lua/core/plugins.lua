@@ -245,7 +245,6 @@ use { "nvim-lualine/lualine.nvim",
       },
       sections = {
         lualine_a = {
-          { function() return "|" end, padding = { left = 0, right = 0 } },
           { "mode", padding = { left = 1, right = 1 } },
         },
         lualine_b = {
