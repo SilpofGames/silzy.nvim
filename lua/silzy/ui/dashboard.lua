@@ -259,7 +259,7 @@ end
 
 function M.setup()
   local config = require("silzy").config or {}
-  local preferred = config.dashboard or "auto"
+  local preferred = config.dashboard or "snacks"
 
   -- If explicitly native, setup the autocmd
   if preferred == "native" then
@@ -273,7 +273,7 @@ function M.setup()
     return
   end
 
-  -- For "auto" or external dashboards, we check if they are installed/available
+  -- For "snacks" or external dashboards, we check if they are installed/available
   -- without using 'require' to avoid module loading loops
   local install_path = vim.fn.stdpath("data") .. "/silzy/plugins"
   local has_snacks = vim.fn.isdirectory(install_path .. "/folke-snacks.nvim") == 1
@@ -301,7 +301,7 @@ end
 
 function M.open()
   local config = require("silzy").config or {}
-  local preferred = config.dashboard or "auto"
+  local preferred = config.dashboard or "snacks"
 
   if preferred == "snacks" then
     return open_with_snacks()
