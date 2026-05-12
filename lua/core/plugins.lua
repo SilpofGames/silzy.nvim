@@ -71,7 +71,6 @@ use { "folke/snacks.nvim",
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
           { 
-            section = "text", 
             text = { { " silzy.nvim v0.1.0 ", hl = "Special" } },
             padding = 1,
             indent = 8,
