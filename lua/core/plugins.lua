@@ -63,6 +63,9 @@ use { "folke/snacks.nvim",
     end
 
     local fetch_cmd = get_fetch_cmd()
+    local silzy_config = require("silzy").config or {}
+    local show_fetch = silzy_config.fetch ~= false -- default to true if not specified
+
     local dashboard_sections = {
       { section = "header" },
       { section = "keys", gap = 1, padding = 1 },
@@ -73,7 +76,7 @@ use { "folke/snacks.nvim",
       },
     }
 
-    if fetch_cmd then
+    if fetch_cmd and show_fetch then
       table.insert(dashboard_sections, {
         section = "terminal",
         cmd = fetch_cmd,
