@@ -70,10 +70,15 @@ use { "folke/snacks.nvim",
         sections = {
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
-          { section = "startup" },
+          { 
+            section = "text", 
+            text = { { " silzy.nvim v0.1.0 ", hl = "Special" } },
+            padding = 1,
+            indent = 8,
+          },
           {
             section = "terminal",
-            cmd = "fortune -s | cowsay",
+            cmd = "neofetch --off --color_blocks off || screenfetch || echo 'silzy.nvim'",
             hl = "header",
             padding = 1,
             indent = 8,
