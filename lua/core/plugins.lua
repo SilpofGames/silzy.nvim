@@ -1,3 +1,7 @@
+use { "goolord/alpha-nvim",
+  requires = { "nvim-tree/nvim-web-devicons" },
+}
+
 use { "folke/snacks.nvim",
   config = function()
     require("snacks").setup({
@@ -220,47 +224,64 @@ use { "nvim-lualine/lualine.nvim",
       return " " .. clients[1].name
     end
 
+    local colors = {
+      blue   = "#89b4fa",
+      cyan   = "#89dceb",
+      black  = "#181825",
+      white  = "#cdd6f4",
+      red    = "#f38ba8",
+      violet = "#cba6f7",
+      grey   = "#313244",
+    }
+
+    local bubbles_theme = {
+      normal = {
+        a = { fg = colors.black, bg = colors.blue },
+        b = { fg = colors.white, bg = colors.grey },
+        c = { fg = colors.white },
+      },
+      insert = { a = { fg = colors.black, bg = colors.red } },
+      visual = { a = { fg = colors.black, bg = colors.cyan } },
+      replace = { a = { fg = colors.black, bg = colors.red } },
+      inactive = {
+        a = { fg = colors.white, bg = colors.black },
+        b = { fg = colors.white, bg = colors.black },
+        c = { fg = colors.white },
+      },
+    }
+
     require("lualine").setup({
       options = {
-        theme            = "auto",
+        theme            = bubbles_theme,
         globalstatus     = true,
-        component_separators = { left = "", right = "" },
-        section_separators  = { left = "", right = "" },
+        component_separators = "",
+        section_separators  = { left = "", right = "" },
         disabled_filetypes  = { statusline = { "dashboard", "silzy-dashboard" } },
       },
       sections = {
-        lualine_a = {
-          { "mode", separator = { left = "" }, right_padding = 2 },
+        lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
+        lualine_b = { 
+          { "filename", separator = { right = "" } },
+          { "branch", icon = "  ", separator = { left = "", right = "" } },
         },
-        lualine_b = {
-          { "branch", icon = "" },
-          { "diff",
-            symbols = { added = " ", modified = " ", removed = " " },
-          },
-        },
-        lualine_c = {
-          { "filename", path = 1, symbols = { modified = "  ", readonly = "  " } },
-        },
+        lualine_c = { "%=" },
         lualine_x = {
-          { "diagnostics",
-            sources = { "nvim_lsp" },
-            symbols = { error = " ", warn = " ", info = " ", hint = " " },
-          },
-          { lsp_name },
-          { "filetype", icon_only = false },
+          { lsp_name, icon = " ", separator = { left = "", right = "" } },
         },
-        lualine_y = { "progress" },
+        lualine_y = {
+          { "filetype", separator = { left = "", right = "" } },
+        },
         lualine_z = {
-          { "location", separator = { right = "" }, left_padding = 2 },
+          { "location", separator = { left = "", right = "" }, left_padding = 2 },
         },
       },
       inactive_sections = {
-        lualine_a = {},
+        lualine_a = { "filename" },
         lualine_b = {},
-        lualine_c = { "filename" },
-        lualine_x = { "location" },
+        lualine_c = {},
+        lualine_x = {},
         lualine_y = {},
-        lualine_z = {},
+        lualine_z = { "location" },
       },
     })
   end,

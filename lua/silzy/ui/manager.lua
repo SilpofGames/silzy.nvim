@@ -160,21 +160,50 @@ local function render()
     else
       push("  Installed colorschemes  —  Enter to apply", "Comment")
       push("")
+
+      local palettes = {
+        catppuccin = { "#f38ba8", "#a6e3a1", "#89b4fa" },
+        tokyonight = { "#f7768e", "#9ece6a", "#7aa2f7" },
+        ["rose-pine"] = { "#eb6f92", "#31748f", "#f6c177" },
+        gruvbox = { "#cc241d", "#98971a", "#d79921" },
+        kanagawa = { "#e82424", "#98bb6c", "#7e9cd8" },
+        nightfox = { "#df6d03", "#81b29a", "#719cd6" },
+        default = { "#ff5555", "#50fa7b", "#8be9fd" },
+      }
+
       for i, cs in ipairs(STATE.cs_list) do
         local is_active  = cs.name == STATE.cs_current
         local is_cursor  = i == STATE.cs_cursor
         local prefix = is_active and "  " or "   "
-        local line = string.format("%s%-32s  %s", prefix, cs.name, cs.plugin)
+        
+        -- Color preview
+        local palette = palettes.default
+        for name, p in pairs(palettes) do
+          if cs.name:lower():match(name) then palette = p; break end
+        end
+        
+        local preview = "█ █ █ "
+        local line = string.format("%s%s%-32s  %s", prefix, preview, cs.name, cs.plugin)
         push(line)
+        
         local lnum = #lines - 1
+        local start_col = #prefix
+        
+        -- Add highlights for the 3 blocks
+        for j = 1, 3 do
+          local group = "SilzyCSColor" .. i .. "_" .. j
+          api.nvim_set_hl(0, group, { fg = palette[j] })
+          hl(lnum, group, start_col + (j-1)*2, start_col + (j-1)*2 + 3)
+        end
+
         if is_cursor and is_active then
-          hl(lnum, "Title", 0)
+          hl(lnum, "Title", start_col + 6)
         elseif is_cursor then
-          hl(lnum, "PmenuSel", 0)
+          hl(lnum, "PmenuSel", start_col + 6)
         elseif is_active then
-          hl(lnum, "DiagnosticOk", 0)
+          hl(lnum, "DiagnosticOk", start_col + 6)
         else
-          hl(lnum, "Normal", 0)
+          hl(lnum, "Normal", start_col + 6)
         end
       end
     end

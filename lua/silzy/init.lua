@@ -296,7 +296,8 @@ local function bootstrap_sync(id)
 end
 
 function M.setup(opts)
-  opts = opts or {}
+  M.config = opts or {}
+  opts = M.config
   ensure_dirs()
 
   local snacks_dir  = bootstrap_sync("folke/snacks.nvim")

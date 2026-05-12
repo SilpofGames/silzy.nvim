@@ -193,29 +193,56 @@ local function open_with_snacks()
   })
 end
 
+local function open_with_alpha()
+  local ok, alpha = pcall(require, "alpha")
+  if not ok then return open_native() end
+  local dashboard = require("alpha.themes.dashboard")
+  dashboard.section.header.val = header
+  dashboard.section.buttons.val = {
+    dashboard.button("n", "  New File",     ":enew<CR>"),
+    dashboard.button("f", "  Find File",    ":Telescope find_files<CR>"),
+    dashboard.button("r", "  Recent Files", ":Telescope oldfiles<CR>"),
+    dashboard.button("q", "  Quit",         ":qa<CR>"),
+  }
+  alpha.setup(dashboard.opts)
+  pcall(vim.cmd, "Alpha")
+end
+
 function M.setup()
   vim.api.nvim_create_autocmd("VimEnter", {
     once     = true,
     callback = function()
       if vim.fn.argc() > 0 then return end
       vim.schedule(function()
-        local has_snacks = pcall(require, "snacks.dashboard")
-        if has_snacks then
-          open_with_snacks()
-        else
-          open_native()
-        end
+        M.open()
       end)
     end,
   })
 end
 
 function M.open()
+  local config = require("silzy").config or {}
+  local preferred = config.dashboard or "auto"
+
+  if preferred == "snacks" then
+    return open_with_snacks()
+  elseif preferred == "alpha" then
+    return open_with_alpha()
+  elseif preferred == "native" then
+    return open_native()
+  end
+
+  -- auto detection
   local has_snacks = pcall(require, "snacks.dashboard")
   if has_snacks then
     open_with_snacks()
   else
-    open_native()
+    local has_alpha = pcall(require, "alpha")
+    if has_alpha then
+      open_with_alpha()
+    else
+      open_native()
+    end
   end
 end
 
