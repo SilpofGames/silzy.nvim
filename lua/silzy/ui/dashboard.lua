@@ -68,17 +68,36 @@ local function open_native()
           if ok then b.oldfiles({ include_current_session = true }) end
         end, 50)
       end },
+    { key = "s", label = "  Last Session", fn = function()
+        local sfile = vim.fn.stdpath("data") .. "/silzy/session.vim"
+        if vim.fn.filereadable(sfile) == 1 then
+          vim.cmd("source " .. sfile)
+        else
+          vim.notify("[silzy] No session found", vim.log.levels.WARN)
+        end
+      end },
     { key = "q", label = "  Quit",         fn = function() vim.cmd("qa") end },
   }
 
+  local silzy = require("silzy")
+  local state = {}
+  local ok_state, state_data = pcall(function()
+    local s_path = vim.fn.stdpath("data") .. "/silzy/state.json"
+    if vim.fn.filereadable(s_path) == 0 then return {} end
+    return vim.fn.json_decode(table.concat(vim.fn.readfile(s_path), "\n"))
+  end)
+  if ok_state then state = state_data end
+  
+  local projects = state.projects or {}
+
   local lines = {}
-  local top_pad = math.max(math.floor((vim.o.lines - #header - #menu * 2 - 7) / 2), 1)
+  local top_pad = math.max(math.floor((vim.o.lines - #header - #menu * 2 - #projects - 10) / 2), 1)
 
   for _ = 1, top_pad do table.insert(lines, "") end
   for _, h in ipairs(header) do table.insert(lines, center(h, width)) end
 
   table.insert(lines, "")
-  local divider = center(string.rep("─", 28), width)
+  local divider = center(string.rep("─", 40), width)
   table.insert(lines, divider)
   table.insert(lines, "")
 
@@ -89,6 +108,22 @@ local function open_native()
     table.insert(lines, "")
   end
 
+  if #projects > 0 then
+    table.insert(lines, center("Recent Projects", width))
+    vim.api.nvim_buf_add_highlight(buf, ns, "Comment", #lines - 1, 0, -1)
+    table.insert(lines, "")
+    for i, p in ipairs(projects) do
+      if i > 5 then break end
+      local label = "  " .. vim.fn.fnamemodify(p, ":~")
+      table.insert(lines, center(label, width))
+      table.insert(menu_line_indices, { 
+        line_nr = #lines - 1, 
+        item = { fn = function() vim.cmd("cd " .. p); M.open() end } 
+      })
+    end
+    table.insert(lines, "")
+  end
+
   table.insert(lines, divider)
   table.insert(lines, "")
   table.insert(lines, center("silzy.nvim", width))
@@ -96,6 +131,15 @@ local function open_native()
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].modifiable = false
+
+  -- Add highlight for session auto-save
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    callback = function()
+      local s_dir = vim.fn.stdpath("data") .. "/silzy"
+      vim.fn.mkdir(s_dir, "p")
+      vim.cmd("mksession! " .. s_dir .. "/session.vim")
+    end
+  })
 
   for i = 1, #header do
     vim.api.nvim_buf_add_highlight(buf, ns, "Function", top_pad + i - 1, 0, -1)

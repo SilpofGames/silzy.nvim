@@ -14,7 +14,7 @@ local STATE = {
   cs_current    = nil,
 }
 
-local TABS = { "plugins", "colorschemes", "log" }
+local TABS = { "plugins", "colorschemes", "profiler", "log" }
 
 local function ts() return os.date("%H:%M:%S") end
 
@@ -97,7 +97,7 @@ local function render()
   push(box(string.rep("─", math.min(win_w - 2, 60)), win_w), "Comment")
   push("")
 
-  local tab_labels = { plugins = "  Plugins", colorschemes = "  Colorschemes", log = "  Log" }
+  local tab_labels = { plugins = "  Plugins", colorschemes = "  Colorschemes", profiler = "  Profiler", log = "  Log" }
   local tab_line = ""
   for _, t in ipairs(TABS) do
     if STATE.tab == t then
@@ -212,6 +212,32 @@ local function render()
     push("")
     push(box(string.rep("─", math.min(win_w - 2, 60)), win_w), "Comment")
     push(box("j/k = navigate   Enter = apply   Tab = next tab   q = close", win_w), "Comment")
+    push("")
+
+  elseif STATE.tab == "profiler" then
+    local silzy = require("silzy")
+    local profile = silzy._profile or {}
+    local sorted = {}
+    for id, time in pairs(profile) do
+      table.insert(sorted, { id = id, time = time })
+    end
+    table.sort(sorted, function(a, b) return a.time > b.time end)
+
+    push("  Plugin Startup Times (ms)", "Comment")
+    push("")
+    local total = 0
+    for _, e in ipairs(sorted) do
+      local group = "DiagnosticOk"
+      if e.time > 20 then group = "DiagnosticError"
+      elseif e.time > 10 then group = "DiagnosticWarn" end
+      push(string.format("    %-45s %6.2f ms", e.id, e.time), group)
+      total = total + e.time
+    end
+    push("")
+    push(string.format("  Total plugin load time: %.2f ms", total), "Special")
+    push("")
+    push(box(string.rep("─", math.min(win_w - 2, 60)), win_w), "Comment")
+    push(box("Tab = next tab   q = close", win_w), "Comment")
     push("")
 
   else

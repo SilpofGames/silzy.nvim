@@ -3,6 +3,7 @@ local M = {}
 M.version  = "0.1.0"
 M._plugins = {}
 M._loaded  = {}
+M._profile = {}
 M._initialized = false
 
 local state_path   = vim.fn.stdpath("data") .. "/silzy/state.json"
@@ -11,6 +12,27 @@ local install_path = vim.fn.stdpath("data") .. "/silzy/plugins"
 local function log(msg, level)
   level = level or vim.log.levels.INFO
   vim.notify("[silzy] " .. msg, level)
+end
+
+local function record_project()
+  local cwd = vim.fn.getcwd()
+  local function r_state()
+    if vim.fn.filereadable(state_path) == 0 then return {} end
+    local ok, data = pcall(vim.fn.readfile, state_path)
+    if not ok then return {} end
+    return vim.fn.json_decode(table.concat(data, "\n")) or {}
+  end
+  local function w_state(s)
+    vim.fn.writefile({ vim.fn.json_encode(s) }, state_path)
+  end
+  local state = r_state()
+  state.projects = state.projects or {}
+  for i, p in ipairs(state.projects) do
+    if p == cwd then table.remove(state.projects, i); break end
+  end
+  table.insert(state.projects, 1, cwd)
+  if #state.projects > 10 then table.remove(state.projects) end
+  w_state(state)
 end
 
 local function is_first_run()
@@ -85,6 +107,7 @@ end
 
 local function load_plugin(plugin)
   if M._loaded[plugin.id] then return end
+  local start_time = vim.loop.hrtime()
   M._loaded[plugin.id] = true
   if vim.fn.isdirectory(plugin.dir) == 0 then return end
   add_to_rtp(plugin.dir)
@@ -96,6 +119,8 @@ local function load_plugin(plugin)
     local ok, err = pcall(plugin.config)
     if not ok then log("config() error in " .. plugin.id .. ": " .. err, vim.log.levels.ERROR) end
   end
+  local end_time = vim.loop.hrtime()
+  M._profile[plugin.id] = (end_time - start_time) / 1e6
 end
 
 local function load_all_into_rtp()
@@ -299,6 +324,7 @@ function M.setup(opts)
   M.config = opts or {}
   opts = M.config
   ensure_dirs()
+  record_project()
 
   local snacks_dir  = bootstrap_sync("folke/snacks.nvim")
   local alpha_dir   = bootstrap_sync("goolord/alpha-nvim")
