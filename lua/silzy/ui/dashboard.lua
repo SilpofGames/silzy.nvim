@@ -218,6 +218,24 @@ function M.setup()
     once     = true,
     callback = function()
       if vim.fn.argc() > 0 then return end
+      
+      -- Check if we should even try to open the native one
+      local config = require("silzy").config or {}
+      local preferred = config.dashboard or "auto"
+      
+      if preferred == "native" then
+        return open_native()
+      end
+      
+      if preferred == "auto" then
+        local has_snacks = pcall(require, "snacks.dashboard")
+        local has_alpha = pcall(require, "alpha")
+        if not has_snacks and not has_alpha then
+          return open_native()
+        end
+      end
+
+      -- If we are here, we let the external dashboard or M.open() handle it
       vim.schedule(function()
         M.open()
       end)

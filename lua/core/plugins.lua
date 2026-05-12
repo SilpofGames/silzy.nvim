@@ -50,6 +50,39 @@ use { "hrsh7th/nvim-cmp",
 
 use { "folke/snacks.nvim",
   config = function()
+    local function get_fetch_cmd()
+      local cmds = { "fastfetch", "neofetch", "screenfetch" }
+      for _, c in ipairs(cmds) do
+        if vim.fn.executable(c) == 1 then
+          if c == "fastfetch" then return "fastfetch --raw" end
+          if c == "neofetch" then return "neofetch --off" end
+          return c
+        end
+      end
+      return nil
+    end
+
+    local fetch_cmd = get_fetch_cmd()
+    local dashboard_sections = {
+      { section = "header" },
+      { section = "keys", gap = 1, padding = 1 },
+      { 
+        text = { { " silzy.nvim v0.1.0 ", hl = "Special" } },
+        padding = 1,
+        indent = 8,
+      },
+    }
+
+    if fetch_cmd then
+      table.insert(dashboard_sections, {
+        section = "terminal",
+        cmd = fetch_cmd,
+        hl = "header",
+        padding = 1,
+        indent = 8,
+      })
+    end
+
     require("snacks").setup({
       indent       = { enabled = true },
       notifier     = { enabled = true, timeout = 3000, style = "compact" },
@@ -67,22 +100,7 @@ use { "folke/snacks.nvim",
       picker       = { enabled = false },
       rename       = { enabled = true },
       dashboard    = {
-        sections = {
-          { section = "header" },
-          { section = "keys", gap = 1, padding = 1 },
-          { 
-            text = { { " silzy.nvim v0.1.0 ", hl = "Special" } },
-            padding = 1,
-            indent = 8,
-          },
-          {
-            section = "terminal",
-            cmd = "neofetch --off --color_blocks off || screenfetch || echo 'silzy.nvim'",
-            hl = "header",
-            padding = 1,
-            indent = 8,
-          },
-        },
+        sections = dashboard_sections,
       },
     })
     local map = function(lhs, fn, desc, mode)
