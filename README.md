@@ -22,6 +22,26 @@
 
 ---
 
+## Install
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/SilpofGames/silzy.nvim/main/scripts/install.ps1 | iex
+```
+
+Then open Neovim — the first-run wizard appears automatically.
+
+---
+
+---
+
 ## Technical Overview
 
 silzy.nvim is not just a configuration; it's a micro-framework for Neovim. It features a custom plugin manager engine that supports lazy-loading, dependency management, and a dedicated UI for maintenance.
