@@ -2,6 +2,13 @@ use { "goolord/alpha-nvim",
   requires = { "nvim-tree/nvim-web-devicons" },
 }
 
+use {
+  "SilpofGames/Workmark.nvim",
+  config = function()
+    require("workmark").setup({})
+  end,
+}
+
 use { "hrsh7th/nvim-cmp",
   requires = {
     "hrsh7th/cmp-nvim-lsp",
